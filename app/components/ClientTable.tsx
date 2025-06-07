@@ -9,7 +9,7 @@ import { calculateTimeInPhase, getClientStatus } from "@/app/utils";
 import { Button } from "@/app/components/ui/button";
 
 export default function ClientTable() {
-  const { clients } = useClients();
+  const { clients, kpis } = useClients();
 
   return (
     <Table>
@@ -30,7 +30,7 @@ export default function ClientTable() {
             <TableCell>{client.stage}</TableCell>
             <TableCell>{client.assignedTo}</TableCell>
             <TableCell>{calculateTimeInPhase(client.startDate)} days</TableCell>
-            <TableCell>{getClientStatus(client)}</TableCell>
+            <TableCell>{getClientStatus(client, kpis)}</TableCell>
             <TableCell>
               <Link href={`/clients/${client.id}`}>
                 <Button variant="outline" size="sm">

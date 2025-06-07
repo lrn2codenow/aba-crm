@@ -7,7 +7,6 @@ import { Client, Contact } from "@/app/types";
 import { useClients } from "@/app/context/ClientsContext";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
-import { Label } from "@/app/components/ui/label";
 import { Trash2 } from "lucide-react";
 
 interface ClientContactsProps {
