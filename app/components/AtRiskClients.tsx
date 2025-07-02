@@ -17,7 +17,7 @@ import { calculateTimeInPhase, getClientStatus } from "@/app/utils";
 import { AlertCircle, Clock } from "lucide-react";
 
 export default function AtRiskClients() {
-  const { clients } = useClients();
+  const { clients, kpis } = useClients();
 
   return (
     <Table>
@@ -31,14 +31,14 @@ export default function AtRiskClients() {
       </TableHeader>
       <TableBody>
         {clients
-          .filter((client) => getClientStatus(client) !== "on-track")
+          .filter((client) => getClientStatus(client, kpis) !== "on-track")
           .map((client) => (
             <TableRow key={client.id}>
               <TableCell>{client.name}</TableCell>
               <TableCell>{client.stage}</TableCell>
               <TableCell>{calculateTimeInPhase(client.start_date)}</TableCell>
               <TableCell>
-                {getClientStatus(client) === "high-risk" ? (
+                {getClientStatus(client, kpis) === "high-risk" ? (
                   <span className="flex items-center text-red-500">
                     <AlertCircle className="mr-1 h-4 w-4" /> High Risk
                   </span>

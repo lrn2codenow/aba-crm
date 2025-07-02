@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Client } from "@/app/types"; // Adjust the import path as necessary
 import { useEffect, useState } from "react";
 import ClientForm from "@/app/components/ClientForm";
@@ -10,10 +10,11 @@ import ClientNotes from "@/app/components/ClientNotes";
 import ClientContacts from "@/app/components/ClientContacts";
 import { useClients } from "@/app/context/ClientsContext";
 
-export default function ClientDetailsPage({ params }: { params: { id: string } }) {
+export default function ClientDetailsPage() {
   const { clients } = useClients();
   const [client, setClient] = useState<Client | null>(null);
   const router = useRouter();
+  const params = useParams<{ id: string }>();
 
   useEffect(() => {
     const foundClient = clients.find((c) => c.id === parseInt(params.id));
@@ -22,7 +23,7 @@ export default function ClientDetailsPage({ params }: { params: { id: string } }
     } else {
       router.push("/clients");
     }
-  }, [params.id, clients]);
+  }, [params.id, clients, router]);
 
   if (!client) {
     return <div>Loading...</div>;
