@@ -1,29 +1,32 @@
 // types/index.ts
 
+export interface Client {
+  id: string;
+  name: string;
+  stage: string;
+  assigned_to: string;
+  start_date: string;
+  notes: Note[];
+  contacts: Contact[];
+}
+
 export interface Note {
-    phase: string;
-    date: string;
-    content: string;
-  }
-  
-  export interface Contact {
-    name: string;
-    relation: string;
-    phone: string;
-    email: string;
-  }
-  
-  export interface Client {
-    id: number;
-    name: string;
-    stage: string;
-    assignedTo: string;
-    startDate: string;
-    notes: Note[];
-    contacts: Contact[];
-  }
-  
-  export interface KPI {
-    [key: string]: number;
-  }
+  id: number;
+  client_id: string;
+  note: string;
+  created_at: string;
+}
+
+export interface Contact {
+  id: number;
+  client_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  created_at: string;
+}
+
+export interface KPI {
+  [key: string]: number;
+}
   
