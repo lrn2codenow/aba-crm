@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import React, { useState, act } from "react";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import {
@@ -15,44 +15,45 @@ import {
 import { Button } from "@/app/components/ui/button";
 import { Client } from "@/app/types";
 import { useClients } from "@/app/context/ClientsContext";
+import { supabase } from "@/lib/supabase";
 
 interface ClientFormProps {
   client?: Client | null;
 }
 
 export default function ClientForm({ client = null }: ClientFormProps) {
-  const { clients, setClients } = useClients();
-  const [formData, setFormData] = useState<Client>(
+  const { fetchClients } = useClients();
+  const [formData, setFormData] = useState<Partial<Client>>(
     client || {
-      id: clients.length + 1,
       name: "",
       stage: "1.1",
-      assignedTo: "",
-      startDate: "",
-      notes: [],
-      contacts: [],
+      assigned_to: "",
+      start_date: "",
     }
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (client) {
       // Update existing client
-      setClients(
-        clients.map((c) => (c.id === client.id ? { ...formData } : c))
-      );
+      const { error } = await supabase
+        .from('clients')
+        .update(formData)
+        .eq('id', client.id);
+      if (error) console.error('Error updating client:', error);
     } else {
       // Add new client
-      setClients([...clients, { ...formData }]);
-      setFormData({
-        id: clients.length + 2,
-        name: "",
-        stage: "1.1",
-        assignedTo: "",
-        startDate: "",
-        notes: [],
-        contacts: [],
+      const { error } = await supabase.from('clients').insert([formData]);
+      if (error) console.error('Error adding client:', error);
+      act(() => {
+        setFormData({
+          name: "",
+          stage: "1.1",
+          assignedTo: "",
+          startDate: "",
+        });
       });
     }
+    fetchClients(); // Refresh the client list
   };
 
   return (
@@ -96,9 +97,9 @@ export default function ClientForm({ client = null }: ClientFormProps) {
           <Label htmlFor="assignedTo">Assigned To</Label>
           <Input
             id="assignedTo"
-            value={formData.assignedTo}
+            value={formData.assigned_to || ''}
             onChange={(e) =>
-              setFormData({ ...formData, assignedTo: e.target.value })
+              setFormData({ ...formData, assigned_to: e.target.value })
             }
           />
         </div>
@@ -107,9 +108,9 @@ export default function ClientForm({ client = null }: ClientFormProps) {
           <Input
             id="startDate"
             type="date"
-            value={formData.startDate}
+            value={formData.start_date || ''}
             onChange={(e) =>
-              setFormData({ ...formData, startDate: e.target.value })
+              setFormData({ ...formData, start_date: e.target.value })
             }
           />
         </div>

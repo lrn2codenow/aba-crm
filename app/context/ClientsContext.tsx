@@ -2,14 +2,9 @@
 
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect, act } from "react";
 import { Client, KPI } from "@/app/types";
-
-const initialClients: Client[] = [
-  // ... (Use your initial clients data)
-];
-
-
+import { supabase } from "@/lib/supabase";
 
 const initialKPIs: KPI = {
   '1.1': 14, // 14 days for Waitlist
@@ -23,23 +18,37 @@ const initialKPIs: KPI = {
   '3.3': 180 // 180 days (6 months) for Active Services before review
 };
 
-
-
 interface ClientsContextProps {
   clients: Client[];
   setClients: (clients: Client[]) => void;
   kpis: KPI;
   setKPIs: (kpis: KPI) => void;
+  fetchClients: () => void;
 }
 
 const ClientsContext = createContext<ClientsContextProps | null>(null);
 
 export function ClientsProvider({ children }: { children: React.ReactNode }) {
-  const [clients, setClients] = useState<Client[]>(initialClients);
+  const [clients, setClients] = useState<Client[]>([]);
   const [kpis, setKPIs] = useState<KPI>(initialKPIs);
 
+  const fetchClients = async () => {
+    const { data, error } = await supabase.from('clients').select('*');
+    if (error) {
+      console.error('Error fetching clients:', error);
+    } else {
+      act(() => {
+        setClients(data || []);
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
   return (
-    <ClientsContext.Provider value={{ clients, setClients, kpis, setKPIs }}>
+    <ClientsContext.Provider value={{ clients, setClients, kpis, setKPIs, fetchClients }}>
       {children}
     </ClientsContext.Provider>
   );
@@ -52,3 +61,4 @@ export function useClients() {
   }
   return context;
 }
+

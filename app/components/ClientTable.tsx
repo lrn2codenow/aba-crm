@@ -2,6 +2,7 @@
 
 "use client";
 
+import React from 'react';
 import { useClients } from "@/app/context/ClientsContext";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
 import Link from "next/link";
@@ -28,8 +29,8 @@ export default function ClientTable() {
           <TableRow key={client.id}>
             <TableCell>{client.name}</TableCell>
             <TableCell>{client.stage}</TableCell>
-            <TableCell>{client.assignedTo}</TableCell>
-            <TableCell>{calculateTimeInPhase(client.startDate)} days</TableCell>
+            <TableCell>{client.assigned_to}</TableCell>
+            <TableCell>{calculateTimeInPhase(client.start_date)} days</TableCell>
             <TableCell>{getClientStatus(client)}</TableCell>
             <TableCell>
               <Link href={`/clients/${client.id}`}>

@@ -2,98 +2,61 @@
 
 "use client";
 
-import { useState } from "react";
-import { Client, Note } from "@/app/types";
-import { useClients } from "@/app/context/ClientsContext";
-import { Input } from "@/app/components/ui/input";
-import { Textarea } from "@/app/components/ui/textarea";
+import React, { useState, useEffect, act } from "react";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/app/components/ui/button";
-import { Label } from "@/app/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
+import { Textarea } from "@/app/components/ui/textarea";
+import { Client, Note } from "@/app/types";
 
 interface ClientNotesProps {
   client: Client;
 }
 
 export default function ClientNotes({ client }: ClientNotesProps) {
-  const { clients, setClients } = useClients();
-  const [newNote, setNewNote] = useState<Note>({
-    phase: "",
-    date: "",
-    content: "",
-  });
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [newNote, setNewNote] = useState("");
 
-  const addNote = () => {
-    if (newNote.phase && newNote.date && newNote.content) {
-      const updatedClients = clients.map((c) =>
-        c.id === client.id
-          ? { ...c, notes: [...c.notes, { ...newNote }] }
-          : c
-      );
-      setClients(updatedClients);
-      setNewNote({ phase: "", date: "", content: "" });
+  useEffect(() => {
+    if (client) {
+      setNotes(client.notes || []);
+    }
+  }, [client]);
+
+  const handleAddNote = async () => {
+    const { data, error } = await supabase
+      .from('client_notes')
+      .insert([{ note: newNote, client_id: client.id }])
+      .select();
+
+    if (error) {
+      console.error("Error adding note:", error);
+    } else if (data) {
+      act(() => {
+        setNotes([...notes, data[0]]);
+        setNewNote("");
+      });
     }
   };
 
   return (
-    <div className="space-y-4 mt-6">
-      <h2 className="text-xl font-semibold">Notes</h2>
-      <div className="space-y-2">
-        {client.notes.map((note, index) => (
-          <div key={index} className="bg-gray-100 p-2 rounded">
-            <p className="text-sm font-medium">
-              {note.phase} - {note.date}
-            </p>
-            <p className="text-sm">{note.content}</p>
+    <div className="mt-6">
+      <h2 className="text-2xl font-bold mb-4">Notes</h2>
+      <div className="space-y-4">
+        {notes.map((note) => (
+          <div key={note.id} className="p-2 border rounded-md">
+            <p>{note.note}</p>
+            <p className="text-xs text-gray-500">{new Date(note.created_at).toLocaleDateString()}</p>
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label htmlFor="note-phase">Phase</Label>
-          <Select
-            value={newNote.phase}
-            onValueChange={(value) => setNewNote({ ...newNote, phase: value })}
-          >
-            <SelectTrigger id="note-phase">
-              <SelectValue placeholder="Select phase" />
-            </SelectTrigger>
-            <SelectContent>
-              {/* Replace with your actual phases */}
-              <SelectItem value="1.1">1.1 - Waitlist</SelectItem>
-              <SelectItem value="2.1">2.1 - Assessment Waitlist</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="note-date">Date</Label>
-          <Input
-            id="note-date"
-            type="date"
-            value={newNote.date}
-            onChange={(e) =>
-              setNewNote({ ...newNote, date: e.target.value })
-            }
-          />
-        </div>
-        <div>
-          <Label htmlFor="note-content">Content</Label>
-          <Textarea
-            id="note-content"
-            value={newNote.content}
-            onChange={(e) =>
-              setNewNote({ ...newNote, content: e.target.value })
-            }
-          />
-        </div>
+      <div className="mt-4">
+        <Textarea
+          placeholder="Add a new note..."
+          value={newNote}
+          onChange={(e) => setNewNote(e.target.value)}
+        />
+        <Button onClick={handleAddNote} className="mt-2">Add Note</Button>
       </div>
-      <Button onClick={addNote}>Add Note</Button>
     </div>
   );
 }

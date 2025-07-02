@@ -2,6 +2,7 @@
 
 "use client";
 
+import React from 'react';
 import { useClients } from "@/app/context/ClientsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Users, Clock } from "lucide-react";

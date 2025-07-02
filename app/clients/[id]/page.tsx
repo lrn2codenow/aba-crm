@@ -2,27 +2,37 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Client } from "@/app/types"; // Adjust the import path as necessary
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import ClientForm from "@/app/components/ClientForm";
 import ClientNotes from "@/app/components/ClientNotes";
 import ClientContacts from "@/app/components/ClientContacts";
-import { useClients } from "@/app/context/ClientsContext";
+import { Client } from "@/app/types";
 
-export default function ClientDetailsPage({ params }: { params: { id: string } }) {
-  const { clients } = useClients();
+export default function ClientDetailsPage() {
+  const { id } = useParams();
   const [client, setClient] = useState<Client | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
-    const foundClient = clients.find((c) => c.id === parseInt(params.id));
-    if (foundClient) {
-      setClient(foundClient);
-    } else {
-      router.push("/clients");
+    const fetchClient = async () => {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*, client_notes(*), client_contacts(*)')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching client:', error);
+      } else {
+        setClient(data);
+      }
+    };
+
+    if (id) {
+      fetchClient();
     }
-  }, [params.id, clients]);
+  }, [id]);
 
   if (!client) {
     return <div>Loading...</div>;
