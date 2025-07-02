@@ -2,6 +2,8 @@
 
 "use client";
 
+import React from 'react';
+
 import { useClients } from "@/app/context/ClientsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Progress } from "@/app/components/ui/progress";
@@ -14,7 +16,7 @@ export default function PhasePerformance() {
     const phaseClients = clients.filter((client) => client.stage === phase);
     const onTrack = phaseClients.filter(
       (client) =>
-        calculateTimeInPhase(client.startDate) <= (kpis[phase] || 0)
+        calculateTimeInPhase(client.start_date) <= (kpis[phase] || 0)
     ).length;
     return phaseClients.length > 0
       ? (onTrack / phaseClients.length) * 100

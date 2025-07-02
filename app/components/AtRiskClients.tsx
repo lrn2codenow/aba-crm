@@ -2,6 +2,8 @@
 
 "use client";
 
+import React from 'react';
+
 import { useClients } from "@/app/context/ClientsContext";
 import {
   Table,
@@ -34,7 +36,7 @@ export default function AtRiskClients() {
             <TableRow key={client.id}>
               <TableCell>{client.name}</TableCell>
               <TableCell>{client.stage}</TableCell>
-              <TableCell>{calculateTimeInPhase(client.startDate)}</TableCell>
+              <TableCell>{calculateTimeInPhase(client.start_date)}</TableCell>
               <TableCell>
                 {getClientStatus(client) === "high-risk" ? (
                   <span className="flex items-center text-red-500">

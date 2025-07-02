@@ -2,6 +2,8 @@
 
 "use client";
 
+import React from 'react';
+
 import DashboardCards from "@/app/components/DashboardCards";
 import PhasePerformance from "@/app/components/PhasePerformance";
 import AtRiskClients from "@/app/components/AtRiskClients";

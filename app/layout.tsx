@@ -1,5 +1,8 @@
 // app/layout.tsx
 
+'use client';
+
+import React from 'react';
 import "./globals.css";
 import { ClientsProvider } from "@/app/context/ClientsContext";
 import Navbar from "@/app/components/Navbar";
